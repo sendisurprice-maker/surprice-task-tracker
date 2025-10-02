@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Management Tracker Surprice</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f9; }
+    header { background: #2c3e50; color: white; padding: 15px; text-align: center; font-size: 22px; }
+    .login-box, .content { max-width: 500px; margin: 80px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    .hidden { display: none; }
+    input[type=text], input[type=password] {
+      width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px;
+    }
+    button {
+      padding: 10px 20px; background: #1abc9c; color: white; border: none; border-radius: 6px; cursor: pointer;
+    }
+    button:hover { background: #16a085; }
+    .sidebar {
+      width: 220px; background: #34495e; position: fixed; top: 0; bottom: 0; left: 0; padding-top: 60px;
+    }
+    .sidebar a { display: block; color: white; padding: 12px; text-decoration: none; }
+    .sidebar a:hover { background: #1abc9c; }
+    .main { margin-left: 240px; padding: 20px; }
+    .report-link { background: #ecf0f1; margin: 8px 0; padding: 10px; border-radius: 6px; }
+    footer { margin-top: 30px; text-align: center; font-size: 12px; color: gray; }
+  </style>
+</head>
+<body>
+  <header>📊 Task Management Tracker Operasional Surprice</header>
+
+  <!-- LOGIN -->
+  <div id="login" class="login-box">
+    <h2>Welcome</h2>
+    <p>Please login to access Task Management Tracker</p>
+    <input type="text" id="username" placeholder="Enter Username">
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+    <p id="error" style="color:red;"></p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden">
+    <div class="sidebar">
+      <a href="#" onclick="showReports('Gudang')">Gudang</a>
+      <a href="#" onclick="showReports('cs')">Customer Service</a>
+      <a href="#" onclick="showReports('marketing')">Marketing</a>
+      <a href="#" onclick="showReports('driver')">Driver</a>
+      <a href="#" onclick="showReports('finance')">Finance</a>
+      <a href="#" onclick="showReports('operasional')">Kepala Operasional</a>
+      <a href="#" onclick="showReports('admin')">Admin</a>
+    </div>
+
+    <div class="main">
+      <h2 id="menu-title">Pilih Menu</h2>
+      <div id="report-list"></div>
+
+      <!-- Form tambah laporan -->
+      <div id="add-report" class="hidden">
+        <h3>Tambah Link Laporan</h3>
+        <input type="text" id="report-name" placeholder="Nama Laporan (misal: Lap Operasional Oktober 2025)">
+        <input type="text" id="report-url" placeholder="Paste Link Google Spreadsheet">
+        <button onclick="saveReport()">Simpan</button>
+      </div>
+      <footer>© Sendi_Muchdianto</footer>
+    </div>
+  </div>
+
+  <script>
+    // Simpan user & pass (bisa kamu ganti sesuai kebutuhan)
+    const USER = "admin";
+    const PASS = "1234";
+
+    // Data laporan (disimpan di browser localStorage biar permanen)
+    let reports = JSON.parse(localStorage.getItem("reports")) || {
+      cs: [], marketing: [], driver: [], finance: [], operasional: [], admin: []
+    };
+
+    let currentMenu = "";
+
+    function login() {
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      if (u === USER && p === PASS) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+      } else {
+        document.getElementById("error").innerText = "Invalid username or password!";
+      }
+    }
+
+    function showReports(menu) {
+      currentMenu = menu;
+      const list = document.getElementById("report-list");
+      const title = document.getElementById("menu-title");
+      const addForm = document.getElementById("add-report");
+
+      title.innerText = "Daftar Laporan " + menu.toUpperCase();
+      list.innerHTML = "";
+      reports[menu].forEach((r, i) => {
+        const div = document.createElement("div");
+        div.className = "report-link";
+        div.innerHTML = `<a href="${r.url}" target="_blank">${r.name}</a>`;
+        list.appendChild(div);
+      });
+
+      // tampilkan form tambah laporan
+      addForm.classList.remove("hidden");
+    }
+
+    function saveReport() {
+      const name = document.getElementById("report-name").value;
+      const url = document.getElementById("report-url").value;
+
+      if (name && url) {
+        reports[currentMenu].push({ name, url });
+        localStorage.setItem("reports", JSON.stringify(reports));
+        showReports(currentMenu);
+        document.getElementById("report-name").value = "";
+        document.getElementById("report-url").value = "";
+      }
+    }
+  </script>
+</body>
+</html>
